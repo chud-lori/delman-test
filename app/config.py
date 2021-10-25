@@ -1,3 +1,5 @@
+import os
+
 class Config(object):
     """
     class Config to store credential information
@@ -6,5 +8,5 @@ class Config(object):
     DB_USERNAME = 'postgres'
     DB_PASSWORD = 'postgres'
     DB = 'delman'
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:postgres@localhost:5432/delman'
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite://")
     SQLALCHEMY_TRACK_MODIFICATIONS = True

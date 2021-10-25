@@ -6,9 +6,17 @@ this represent the corpe/ directory
 
 from flask import Flask
 from app.config import Config
-from app.db import connect_db
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
+# from apscheduler.schedulers.background import BackgroundScheduler
+
+# def sensor():
+#     """ Function for test purposes. """
+#     print("Scheduler is alive!")
+
+# sched = BackgroundScheduler(daemon=True)
+# sched.add_job(sensor,'interval',seconds=6)
+# sched.start()
 
 # db = connect_db()
 db = SQLAlchemy()
@@ -30,6 +38,12 @@ def create_app(config=Config):
     with app.app_context():
         # Import routes
         from app.routes.employee import employee_bp
+        from app.routes.doctor import doctor_bp
+        from app.routes.patient import patient_bp
+        from app.routes.appointment import appointment_bp
         app.register_blueprint(employee_bp)
+        app.register_blueprint(doctor_bp)
+        app.register_blueprint(patient_bp)
+        app.register_blueprint(appointment_bp)
         
         return app
