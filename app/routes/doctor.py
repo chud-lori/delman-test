@@ -27,7 +27,7 @@ def doctors():
                 return jsonify({"message": f"failed, {req} is required"}), 400
         if Doctor.query.filter_by(username=request.form.get("username")).first():
             return jsonify({"message": "username already existed"}), 400
-        data = Doctor(
+        doctor = Doctor(
             name=request.form.get("name"),
             username=request.form.get("username"),
             password=request.form.get("password"),
@@ -36,12 +36,20 @@ def doctors():
             work_start_time=request.form.get("work_start_time"),
             work_end_time=request.form.get("work_end_time"),
         )
-        # try:
-        db.session.add(data)
-        db.session.commit()
-        return jsonify({"data": data.name, "message": "success", "status": 1}), 201
-        # except:
-        #     return jsonify({"message": "failed"}), 500
+        try:
+            db.session.add(doctor)
+            db.session.commit()
+            data = {
+                "name": doctor.name,
+                "username": doctor.username,
+                "gender": doctor.gender.value,
+                "birthdate": doctor.birthdate.strftime("%Y-%m-%d"),
+                "work_start_time": doctor.work_start_time.strftime("%H:%M:%S"),
+                "work_end_time": doctor.work_end_time.strftime("%H:%M:%S"),
+            }
+            return jsonify({"data": data, "message": "doctor created", "status": 1}), 201
+        except:
+            return jsonify({"message": "failed"}), 500
     doc_all = Doctor.query.all()
     doctors = [
         {

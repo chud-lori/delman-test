@@ -45,7 +45,7 @@ def employees():
                 return jsonify({"message": f"failed, {req} is required"}), 400
         if Employee.query.filter_by(username=request.form.get("username")).first():
             return jsonify({"message": "username already existed"}), 400
-        data = Employee(
+        employee = Employee(
             name=request.form.get("name"),
             username=request.form.get("username"),
             password=request.form.get("password"),
@@ -53,9 +53,15 @@ def employees():
             birthdate=request.form.get("birthdate"),
         )
         try:
-            db.session.add(data)
+            db.session.add(employee)
             db.session.commit()
-            return jsonify({"data": data.name, "message": "success", "status": 1}), 201
+            data = {
+                "name": employee.name,
+                "username": employee.username,
+                "gender": employee.gender.value,
+                "birthdate": employee.birthdate.strftime("%Y-%m-%d"),
+            }
+            return jsonify({"data": data, "message": "employee created", "status": 1}), 201
         except:
             return jsonify({"message": "failed"}), 500
     emp_all = Employee.query.all()

@@ -22,7 +22,7 @@ def patients():
                 return jsonify({"message": f"failed, {req} is required"}), 400
         if Patient.query.filter_by(no_ktp=request.form.get("no_ktp")).first():
             return jsonify({"message": "no_ktp already existed"}), 400
-        data = Patient(
+        patient = Patient(
             name=request.form.get("name"),
             gender=request.form.get("gender"),
             birthdate=request.form.get("birthdate"),
@@ -32,9 +32,18 @@ def patients():
             vaccine_count=request.form.get("vaccine_count"),
         )
         try:
-            db.session.add(data)
+            db.session.add(patient)
             db.session.commit()
-            return jsonify({"data": data.name, "message": "success", "status": 1}), 201
+            data = {
+                "name": patient.name,
+                "gender": patient.gender.value,
+                "birthdate": patient.birthdate.strftime("%Y-%m-%d"),
+                "no_ktp": patient.no_ktp,
+                "address": patient.address,
+                "vaccine_type": patient.vaccine_type,
+                "vaccine_count": patient.vaccine_count,
+            }
+            return jsonify({"data": data, "message": "patient created", "status": 1}), 201
         except:
             return jsonify({"message": "failed"}), 500
     pat_all = Patient.query.all()

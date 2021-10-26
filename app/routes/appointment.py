@@ -29,7 +29,7 @@ def appointments():
         for req in required:
             if req not in request.form:
                 return jsonify({"message": f"failed, {req} is required"}), 400
-        data = Appointment(
+        appointment = Appointment(
             patient_id=request.form.get("patient_id"),
             doctor_id=request.form.get("doctor_id"),
             datetime=request.form.get("datetime"),
@@ -38,9 +38,17 @@ def appointments():
             notes="null" if request.form.get("notes") is None else request.form.get("notes"),
         )
         try:
-            db.session.add(data)
+            db.session.add(appointment)
             db.session.commit()
-            return jsonify({"data": data.status.value, "message": "success", "status": 1}), 201
+            data = {
+                "patient_id": appointment.patient_id,
+                "doctor_id": appointment.doctor_id,
+                "datetime": appointment.datetime.strftime("%Y-%m-%d %H:%M:%S"),
+                "status": appointment.status.value,
+                "diagnose": appointment.diagnose,
+                "notes": appointment.notes,
+            }
+            return jsonify({"data": data, "message": "appoinment created", "status": 1}), 201
         except:
             return jsonify({"message": "failed"}), 500
     appo_all = Appointment.query.all()

@@ -46,8 +46,9 @@ def schedule_patient():
             }
         print("vaccine data updated")
         return (
-            jsonify({"data": patient, "message": "patient updated", "status": 1}),
+            jsonify({"data": patient, "message": "vaccine data updated", "status": 1}),
             200,
         )
     except:
+        print("update failed")
         return jsonify({"message": "update failed", "status": 0}), 500
