@@ -13,6 +13,8 @@ doctor_bp = Blueprint("doctor_bp", __name__)
 @jwt.is_login
 def doctors():
     if request.method == "POST":
+        if request.is_json == False:
+            return jsonify({"message": "failed, please input in json format", "status": 0}), 400
         required = [
             "name",
             "username",
@@ -23,18 +25,18 @@ def doctors():
             "work_end_time",
         ]
         for req in required:
-            if req not in request.form:
+            if req not in request.json:
                 return jsonify({"message": f"failed, {req} is required"}), 400
-        if Doctor.query.filter_by(username=request.form.get("username")).first():
+        if Doctor.query.filter_by(username=request.json["username"]).first():
             return jsonify({"message": "username already existed"}), 400
         doctor = Doctor(
-            name=request.form.get("name"),
-            username=request.form.get("username"),
-            password=request.form.get("password"),
-            gender=request.form.get("gender"),
-            birthdate=request.form.get("birthdate"),
-            work_start_time=request.form.get("work_start_time"),
-            work_end_time=request.form.get("work_end_time"),
+            name=request.json["name"],
+            username=request.json["username"],
+            password=request.json["password"],
+            gender=request.json["gender"],
+            birthdate=request.json["birthdate"],
+            work_start_time=request.json["work_start_time"],
+            work_end_time=request.json["work_end_time"],
         )
         try:
             db.session.add(doctor)
@@ -49,7 +51,7 @@ def doctors():
             }
             return jsonify({"data": data, "message": "doctor created", "status": 1}), 201
         except:
-            return jsonify({"message": "failed"}), 500
+            return jsonify({"message": "failed creating doctor"}), 500
     doc_all = Doctor.query.all()
     doctors = [
         {
@@ -67,11 +69,13 @@ def doctors():
 
 @doctor_bp.route("/doctors/<id>", methods=["GET", "PUT", "DELETE"])
 @jwt.is_login
-def get_employee_by_id(id):
+def doctor_by_id(id):
     doctor = Doctor.query.filter_by(id=id).first()
     if doctor is None:
         return jsonify({"message": "doctor not found"}), 404
     if request.method == "PUT":
+        if request.is_json == False:
+            return jsonify({"message": "failed, please input in json format", "status": 0}), 400
         required = [
             "name",
             "username",
@@ -82,14 +86,15 @@ def get_employee_by_id(id):
             "work_end_time",
         ]
         for req in required:
-            if req not in request.form:
+            if req not in request.json:
                 return jsonify({"message": f"failed, {req} is required"}), 400
         try:
-            doctor.name = request.form.get("name")
-            doctor.username = request.form.get("username")
-            doctor.password = request.form.get("password")
-            doctor.gender = request.form.get("gender")
-            doctor.birthdate = request.form.get("birthdate")
+            password = bcrypt.generate_password_hash(request.json["password"]).decode('utf-8')
+            doctor.name = request.json["name"]
+            doctor.username = request.json["username"]
+            doctor.password = password
+            doctor.gender = request.json["gender"]
+            doctor.birthdate = request.json["birthdate"]
             db.session.commit()
             doctor = {
                 "name": doctor.name,

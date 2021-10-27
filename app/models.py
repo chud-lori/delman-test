@@ -46,6 +46,15 @@ class Doctor(db.Model):
     birthdate = db.Column(db.Date, nullable=False)
     work_start_time = db.Column(db.Time, nullable=False)
     work_end_time = db.Column(db.Time, nullable=False)
+    def __init__(self, name, username, password, gender, birthdate, work_start_time, work_end_time):
+        password = bcrypt.generate_password_hash(password).decode('utf-8')
+        self.password = password
+        self.name = name
+        self.username = username
+        self.gender = gender
+        self.birthdate = birthdate
+        self.work_start_time = work_start_time
+        self.work_end_time = work_end_time
 
     def __repr__(self):
         return '<Name {}>'.format(self.name)

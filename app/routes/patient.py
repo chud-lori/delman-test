@@ -10,6 +10,8 @@ patient_bp = Blueprint("patient_bp", __name__)
 @jwt.is_login
 def patients():
     if request.method == "POST":
+        if request.is_json == False:
+            return jsonify({"message": "failed, please input in json format", "status": 0}), 400
         required = [
             "name",
             "gender",
@@ -18,18 +20,19 @@ def patients():
             "address",
         ]
         for req in required:
-            if req not in request.form:
+            if req not in request.json:
                 return jsonify({"message": f"failed, {req} is required"}), 400
-        if Patient.query.filter_by(no_ktp=request.form.get("no_ktp")).first():
+        if Patient.query.filter_by(no_ktp=request.json["no_ktp"]).first():
             return jsonify({"message": "no_ktp already existed"}), 400
+
         patient = Patient(
-            name=request.form.get("name"),
-            gender=request.form.get("gender"),
-            birthdate=request.form.get("birthdate"),
-            no_ktp=request.form.get("no_ktp"),
-            address=request.form.get("address"),
-            vaccine_type=request.form.get("vaccine_type"),
-            vaccine_count=request.form.get("vaccine_count"),
+            name=request.json["name"],
+            gender=request.json["gender"],
+            birthdate=request.json["birthdate"],
+            no_ktp=request.json["no_ktp"],
+            address=request.json["address"],
+            vaccine_type="null" if "vaccine_type" not in request.json else request.json["vaccine_type"],
+            vaccine_count=0 if "vaccine_count" not in request.json else request.json["vaccine_count"],
         )
         try:
             db.session.add(patient)
@@ -45,7 +48,7 @@ def patients():
             }
             return jsonify({"data": data, "message": "patient created", "status": 1}), 201
         except:
-            return jsonify({"message": "failed"}), 500
+            return jsonify({"message": "failed creating patient"}), 500
     pat_all = Patient.query.all()
     patients = [
         {
@@ -64,11 +67,13 @@ def patients():
 
 @patient_bp.route("/patients/<id>", methods=["GET", "PUT", "DELETE"])
 @jwt.is_login
-def get_employee_by_id(id):
+def patient_by_id(id):
     patient = Patient.query.filter_by(id=id).first()
     if patient is None:
         return jsonify({"message": "patient not found"}), 404
     if request.method == "PUT":
+        if request.is_json == False:
+            return jsonify({"message": "failed, please input in json format", "status": 0}), 400
         required = [
             "name",
             "gender",
@@ -79,16 +84,16 @@ def get_employee_by_id(id):
             "vaccine_count",
         ]
         for req in required:
-            if req not in request.form:
+            if req not in request.json:
                 return jsonify({"message": f"failed, {req} is required"}), 400
         try:
-            patient.name = request.form.get("name")
-            patient.gender = request.form.get("gender")
-            patient.birthdate = request.form.get("birthdate")
-            patient.no_ktp = request.form.get("no_ktp")
-            patient.address = request.form.get("address")
-            patient.vaccine_type = request.form.get("vaccine_type")
-            patient.vaccine_count = request.form.get("vaccine_count")
+            patient.name = request.json["name"]
+            patient.gender = request.json["gender"]
+            patient.birthdate = request.json["birthdate"]
+            patient.no_ktp = request.json["no_ktp"]
+            patient.address = request.json["address"]
+            patient.vaccine_type = request.json["vaccine_type"]
+            patient.vaccine_count = request.json["vaccine_count"]
             db.session.commit()
             patient = {
                 "name": patient.name,

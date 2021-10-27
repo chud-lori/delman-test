@@ -31,6 +31,14 @@ python manage.py create_db
 python manage.py seed_db
 ```
 
+## Run tests
+
+Run this command and access the web app at `localhost:5000`
+
+```bash
+pytest -vv
+```
+
 ## Run
 
 Run this command and access the web app at `localhost:5000`
@@ -44,9 +52,10 @@ python manage.py run -h 0.0.0.0
 ```bash
 docker-compose up -d --build
 docker-compose exec web python manage.py create_db
+docker-compose exec web python manage.py seed_db
 ```
 
-Access `localhost:5000` and input the destination. You can check curl.sh to access di API
+App running on `localhost:5000`. You can check curl.sh to access di API
 
 ## Contributing
 

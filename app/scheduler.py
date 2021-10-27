@@ -19,11 +19,6 @@ def vaccine_data():
     return data
 
 
-# d = vaccine_data()
-# for i in d:
-#     print(d.get(i)[0])
-
-
 def schedule_patient():
     data = vaccine_data()
     try:    

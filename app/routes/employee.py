@@ -11,17 +11,13 @@ employee_bp = Blueprint("employee_bp", __name__)
 
 @employee_bp.route("/login", methods=["POST"])
 def index() -> dict:
-    """
-    The main function to handle base route (/)
-    It has validation and return proper data with proper information in json format
-    """
-    user = Employee.query.filter_by(username=request.form.get("username")).first()
-    # if user is None:
-    #     user = Doctor.query.filter_by(username=request.form.get('username')).first()
+    if request.is_json == False:
+        return jsonify({"message": "failed, please input in json format", "status": 0}), 400
+    user = Employee.query.filter_by(username=request.json["username"]).first()
     if user is None:
         return jsonify({"message": "username not found"}), 404
 
-    if bcrypt.check_password_hash(user.password, request.form.get("password")) == False:
+    if bcrypt.check_password_hash(user.password, request.json["password"]) == False:
         return jsonify({"message": "wrong password"}), 403
 
     auth_token = jwt.encode_auth_token(user.id)
@@ -39,18 +35,20 @@ def index() -> dict:
 @jwt.is_login
 def employees():
     if request.method == "POST":
+        if request.is_json == False:
+            return jsonify({"message": "failed, please input in json format", "status": 0}), 400
         required = ["name", "username", "password", "gender", "birthdate"]
         for req in required:
-            if req not in request.form:
+            if req not in request.json:
                 return jsonify({"message": f"failed, {req} is required"}), 400
-        if Employee.query.filter_by(username=request.form.get("username")).first():
+        if Employee.query.filter_by(username=request.json["username"]).first():
             return jsonify({"message": "username already existed"}), 400
         employee = Employee(
-            name=request.form.get("name"),
-            username=request.form.get("username"),
-            password=request.form.get("password"),
-            gender=request.form.get("gender"),
-            birthdate=request.form.get("birthdate"),
+            name=request.json["name"],
+            username=request.json["username"],
+            password=request.json["password"],
+            gender=request.json["gender"],
+            birthdate=request.json["birthdate"],
         )
         try:
             db.session.add(employee)
@@ -63,7 +61,7 @@ def employees():
             }
             return jsonify({"data": data, "message": "employee created", "status": 1}), 201
         except:
-            return jsonify({"message": "failed"}), 500
+            return jsonify({"message": "failed creating employee"}), 500
     emp_all = Employee.query.all()
     employees = [
         {
@@ -79,22 +77,24 @@ def employees():
 
 @employee_bp.route("/employees/<id>", methods=["GET", "PUT", "DELETE"])
 @jwt.is_login
-def get_employee_by_id(id):
+def employee_by_id(id):
     employee = Employee.query.filter_by(id=id).first()
     if employee is None:
         return jsonify({"message": "employee not found"}), 404
     if request.method == "PUT":
+        if request.is_json == False:
+            return jsonify({"message": "failed, please input in json format", "status": 0}), 400
         required = ["name", "username", "password", "gender", "birthdate"]
         for req in required:
-            if req not in request.form:
+            if req not in request.json:
                 return jsonify({"message": f"failed, {req} is required"}), 400
         try:
-            password = request.form.get("password")
-            employee.name = request.form.get("name")
-            employee.username = request.form.get("username")
+            password = bcrypt.generate_password_hash(request.json["password"]).decode('utf-8')
+            employee.name = request.json["name"]
+            employee.username = request.json["username"]
             employee.password = password
-            employee.gender = request.form.get("gender")
-            employee.birthdate = request.form.get("birthdate")
+            employee.gender = request.json["gender"]
+            employee.birthdate = request.json["birthdate"]
             db.session.commit()
             employee = {
                 "name": employee.name,
