@@ -41,7 +41,7 @@ pytest -vv
 
 ## Run
 
-Run this command and access the web app at `localhost:5000`
+Run this command and access the app app at `localhost:5000`. You can check curl.sh to access di API
 
 ```bash
 python manage.py run -h 0.0.0.0
