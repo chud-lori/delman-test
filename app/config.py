@@ -8,5 +8,5 @@ class Config(object):
     DB_USERNAME = 'postgres'
     DB_PASSWORD = 'postgres'
     DB = 'delman'
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5436/delman")
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/delman")
     SQLALCHEMY_TRACK_MODIFICATIONS = True

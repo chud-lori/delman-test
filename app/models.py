@@ -83,7 +83,7 @@ class Appointment(db.Model):
     doctor_id = db.Column(db.Integer, nullable=False)
     patient_id = db.Column(db.Integer, nullable=False)
     datetime = db.Column(db.DateTime, nullable=False)
-    status = db.Column(db.Enum(Status), nullable=False)
+    status = db.Column(db.Enum(Status), nullable=False, default=Status.IN_QUEUE.value)
     diagnose = db.Column(db.Text, nullable=True)
     notes = db.Column(db.Text, nullable=True)
 

@@ -49,6 +49,8 @@ python manage.py run -h 0.0.0.0
 
 ## Run in docker
 
+P.S. Currently not working, please run locally without docker
+
 ```bash
 docker-compose up -d --build
 docker-compose exec web python manage.py create_db

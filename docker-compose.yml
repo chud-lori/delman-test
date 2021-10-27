@@ -6,12 +6,6 @@ services:
     command: python manage.py run -h 0.0.0.0
     volumes:
       - ./:/usr/src/app/
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=delman
-      - POSTGRES_PORT=5436
-      - POSTGRES_HOST=db
     networks:
       - default
     ports:
@@ -22,12 +16,14 @@ services:
       - db
   db:
     image: postgres:11-alpine
+    container_name: db_delman
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=delman
+      - POSTGRES_HOST_AUTH_METHOD=trust
     networks:
       - default
     ports:
