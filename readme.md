@@ -31,6 +31,18 @@ python manage.py create_db
 python manage.py seed_db
 ```
 
+## Run the scheduler
+
+```bash
+cp vaccine-cron /etc/cron.d/vaccine-cron
+chmod 0644 /etc/cron.d/vaccine-cron
+crontab /etc/cron.d/vaccine-cron
+```
+
+# Create the log file to be able to run tail
+
+RUN touch /var/log/cron.log
+
 ## Run tests
 
 Run this command and access the web app at `localhost:5000`
