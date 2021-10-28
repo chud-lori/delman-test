@@ -37,6 +37,7 @@ python manage.py seed_db
 cp vaccine-cron /etc/cron.d/vaccine-cron
 chmod 0644 /etc/cron.d/vaccine-cron
 crontab /etc/cron.d/vaccine-cron
+touch /var/log/cron.log
 ```
 
 # Create the log file to be able to run tail
